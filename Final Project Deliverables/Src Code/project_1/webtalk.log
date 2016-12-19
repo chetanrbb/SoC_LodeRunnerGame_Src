@@ -1,0 +1,13 @@
+#-----------------------------------------------------------
+# Webtalk v2015.4 (64-bit)
+# SW Build 1412921 on Wed Nov 18 09:43:45 MST 2015
+# IP Build 1412160 on Tue Nov 17 13:47:24 MST 2015
+# Start of session at: Mon May 23 17:11:05 2016
+# Process ID: 10876
+# Current directory: e:/System_on_Chip/Projects/Final/Project 2/project_1
+# Command line: wbtcv.exe -mode batch -source E:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.hw/webtalk/labtool_webtalk.tcl -notrace 2/project_1/project_1.hw/webtalk/labtool_webtalk.log
+# Log file: e:/System_on_Chip/Projects/Final/Project 2/project_1/webtalk.log
+# Journal file: e:/System_on_Chip/Projects/Final/Project 2/project_1\webtalk.jou
+#-----------------------------------------------------------
+invalid command name "rdi::open_ppr_or_dcp"
+INFO: [Common 17-206] Exiting Webtalk at Mon May 23 17:11:05 2016...

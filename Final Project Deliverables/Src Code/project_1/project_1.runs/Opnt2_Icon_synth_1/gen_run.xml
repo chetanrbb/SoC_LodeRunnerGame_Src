@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenRun Id="Opnt2_Icon_synth_1" LaunchPart="xc7a100tcsg324-1" LaunchTime="1464722574">
+  <File Type="RDS-DCP" Name="Opnt2_Icon.dcp"/>
+  <File Type="RUN-CONSTRS" Name="$PDATADIR/runs/Opnt2_Icon_synth_1/constrs_in.xml"/>
+  <File Type="RDS-UTIL-PB" Name="Opnt2_Icon_utilization_synth.pb"/>
+  <File Type="RUN-SRCS" Name="$PDATADIR/runs/Opnt2_Icon_synth_1/sources.xml"/>
+  <File Type="RDS-PROPCONSTRS" Name="Opnt2_Icon_drc_synth.rpt"/>
+  <File Type="PA-TCL" Name="Opnt2_Icon.tcl"/>
+  <File Type="RUN-STRAT" Name="$PDATADIR/runs/Opnt2_Icon_synth_1/Opnt2_Icon_synth_1.psg"/>
+  <File Type="RDS-RDS" Name="Opnt2_Icon.vds"/>
+  <File Type="RDS-UTIL" Name="Opnt2_Icon_utilization_synth.rpt"/>
+  <File Type="VDS-TIMINGSUMMARY" Name="Opnt2_Icon_timing_summary_synth.rpt"/>
+  <File Type="VDS-TIMING-PB" Name="Opnt2_Icon_timing_summary_synth.pb"/>
+  <FileSet Name="sources" Type="BlockSrcs" RelSrcDir="$PSRCDIR/Opnt2_Icon">
+    <File Path="$PSRCDIR/sources_1/ip/Opnt2_Icon/Opnt2_Icon.xci">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <Config>
+      <Option Name="TopModule" Val="Opnt2_Icon"/>
+      <Option Name="UseBlackboxStub" Val="1"/>
+    </Config>
+  </FileSet>
+  <FileSet Name="constrs_in" Type="BlockSrcs" RelSrcDir="$PSRCDIR/Opnt2_Icon">
+    <File Path="$PSRCDIR/sources_1/ip/Opnt2_Icon/Opnt2_Icon.xci">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <Config>
+      <Option Name="TopModule" Val="Opnt2_Icon"/>
+      <Option Name="UseBlackboxStub" Val="1"/>
+    </Config>
+  </FileSet>
+  <Strategy Version="1" Minor="2">
+    <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2015"/>
+    <Step Id="synth_design"/>
+  </Strategy>
+</GenRun>

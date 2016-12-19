@@ -1,0 +1,107 @@
+Copyright 1986-2015 Xilinx, Inc. All Rights Reserved.
+------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2015.4 (win64) Build 1412921 Wed Nov 18 09:43:45 MST 2015
+| Date         : Tue Jun 07 19:43:12 2016
+| Host         : Chetan-PC running 64-bit major release  (build 9200)
+| Command      : report_control_sets -verbose -file n4fpga_control_sets_placed.rpt
+| Design       : n4fpga
+| Device       : xc7a100t
+------------------------------------------------------------------------------------
+
+Control Set Information
+
+Table of Contents
+-----------------
+1. Summary
+2. Flip-Flop Distribution
+3. Detailed Control Set Information
+
+1. Summary
+----------
+
++-------------------------------------------------------------------+-------+
+|                               Status                              | Count |
++-------------------------------------------------------------------+-------+
+| Number of unique control sets                                     |    54 |
+| Minimum Number of register sites lost to control set restrictions |   174 |
++-------------------------------------------------------------------+-------+
+
+
+2. Flip-Flop Distribution
+-------------------------
+
++--------------+-----------------------+------------------------+-----------------+--------------+
+| Clock Enable | Synchronous Set/Reset | Asynchronous Set/Reset | Total Registers | Total Slices |
++--------------+-----------------------+------------------------+-----------------+--------------+
+| No           | No                    | No                     |             320 |          115 |
+| No           | No                    | Yes                    |               0 |            0 |
+| No           | Yes                   | No                     |             214 |           77 |
+| Yes          | No                    | No                     |             238 |           83 |
+| Yes          | No                    | Yes                    |               0 |            0 |
+| Yes          | Yes                   | No                     |             262 |           99 |
++--------------+-----------------------+------------------------+-----------------+--------------+
+
+
+3. Detailed Control Set Information
+-----------------------------------
+
++----------------------------------------------------------------------+------------------------------------------------------------------------+--------------------------------------------------------+------------------+----------------+
+|                             Clock Signal                             |                              Enable Signal                             |                    Set/Reset Signal                    | Slice Load Count | Bel Load Count |
++----------------------------------------------------------------------+------------------------------------------------------------------------+--------------------------------------------------------+------------------+----------------+
+|  prvdr_inst/PROVIDER/instantiate_loader.jtag_loader_6_inst/shift_clk |                                                                        |                                                        |                1 |              1 |
+|  instance_name/inst/clk_out1                                         | prvdr_inst/PROVIDERCPU/flag_enable                                     | prvdr_inst/PROVIDERCPU/internal_reset                  |                1 |              2 |
+|  kbrd/ps2/flag                                                       |                                                                        |                                                        |                1 |              3 |
+| ~kbrd/ps2/debounce/kclkf                                             | kbrd/ps2/cnt                                                           | kbrd/ps2/cnt[3]_i_1_n_0                                |                1 |              4 |
+|  prvdr_inst/PROVIDER/instantiate_loader.jtag_loader_6_inst/jtag_clk  |                                                                        |                                                        |                1 |              4 |
+|  instance_name/inst/clk_out1                                         | DB/db_count[31]_i_1_n_0                                                |                                                        |                2 |              4 |
+|  instance_name/inst/clk_out1                                         | DB/E[0]                                                                |                                                        |                1 |              4 |
+|  instance_name/inst/clk_out1                                         |                                                                        | prvdr_inst/PROVIDERCPU/active_interrupt                |                1 |              4 |
+|  clk_BUFG                                                            | kbrd/ps2/debounce/cnt1[4]_i_2_n_0                                      | kbrd/ps2/debounce/cnt1[4]_i_1_n_0                      |                1 |              5 |
+|  instance_name/inst/clk_out2                                         |                                                                        | vga_dtg/COLOR_reg[11][0]                               |                4 |              6 |
+|  instance_name/inst/clk_out1                                         |                                                                        | prvdr_inst/PROVIDERCPU/internal_reset                  |                3 |              6 |
+|  instance_name/inst/clk_out1                                         | prvdr_inst/PROVIDERCPU/ScrollCntr_reg_reg[7][0]                        | DB/SR[0]                                               |                1 |              8 |
+|  instance_name/inst/clk_out1                                         | prvdr_inst/PROVIDERCPU/Opnt1LocX_reg_L_reg[7][0]                       | DB/SR[0]                                               |                3 |              8 |
+|  instance_name/inst/clk_out1                                         | prvdr_inst/PROVIDERCPU/Opnt1LocY_reg_L_reg[7][0]                       | DB/SR[0]                                               |                5 |              8 |
+|  instance_name/inst/clk_out1                                         | prvdr_inst/PROVIDERCPU/PlyrLocY_reg_L_reg[0][0]                        | DB/SR[0]                                               |                3 |              8 |
+|  instance_name/inst/clk_out1                                         | prvdr_inst/PROVIDERCPU/MapY_reg[0]                                     |                                                        |                2 |              8 |
+|  instance_name/inst/clk_out1                                         | prvdr_inst/PROVIDERCPU/MapX_reg[0]                                     |                                                        |                1 |              8 |
+|  instance_name/inst/clk_out1                                         | prvdr_inst/PROVIDERCPU/E[0]                                            | DB/SR[0]                                               |                1 |              8 |
+|  instance_name/inst/clk_out1                                         | prvdr_inst/PROVIDERCPU/PlyrLocX_reg_L_reg[7][0]                        | DB/SR[0]                                               |                5 |              8 |
+|  instance_name/inst/clk_out1                                         |                                                                        | prvdr_inst/PROVIDER/instruction[7]                     |                3 |              8 |
+|  instance_name/inst/clk_out1                                         | prvdr_inst/PROVIDERCPU/Opnt2LocY_reg_L_reg[7][0]                       | DB/SR[0]                                               |                3 |              8 |
+|  instance_name/inst/clk_out1                                         | prvdr_inst/PROVIDERCPU/Opnt2LocX_reg_L_reg[7][0]                       | DB/SR[0]                                               |                3 |              8 |
+|  instance_name/inst/clk_out1                                         | prvdr_inst/PROVIDERCPU/spm_enable                                      |                                                        |                2 |              8 |
+|  instance_name/inst/clk_out1                                         | prvdr_inst/PROVIDERCPU/Opnt3LocX_reg_L_reg[7][0]                       | DB/SR[0]                                               |                1 |              8 |
+|  int_upd_sysres_BUFG                                                 | opp_mvmnt/p_25_in                                                      |                                                        |                6 |              9 |
+| ~kbrd/ps2/debounce/kclkf                                             |                                                                        |                                                        |                3 |              9 |
+|  int_upd_sysres_BUFG                                                 |                                                                        | DB/SR[0]                                               |                5 |             10 |
+|  instance_name/inst/clk_out2                                         | prvdr_inst/prvdr_pb_if/icon_reg[1]                                     | prvdr_inst/prvdr_pb_if/pixel_address_opnt1_reg[9]_2[0] |                3 |             10 |
+|  instance_name/inst/clk_out2                                         | prvdr_inst/prvdr_pb_if/icon_reg[1]                                     | prvdr_inst/prvdr_pb_if/pixel_address_opnt2_reg[9]_2[0] |                4 |             10 |
+|  instance_name/inst/clk_out2                                         | prvdr_inst/prvdr_pb_if/icon_reg[1]                                     | prvdr_inst/prvdr_pb_if/pixel_address_reg[9]_4[0]       |                3 |             10 |
+|  instance_name/inst/clk_out2                                         | prvdr_inst/prvdr_pb_if/icon_reg[1]                                     | prvdr_inst/prvdr_pb_if/pixel_address_opnt3_reg[9]_4[0] |                4 |             10 |
+|  instance_name/inst/clk_out2                                         | prvdr_inst/prvdr_pb_if/pixel_address_win_scrn_reg[9][0]                |                                                        |                2 |             10 |
+|  instance_name/inst/clk_out2                                         | sndhp/pixel_address_sand_reg[9]_1[0]                                   | sndhp/pixel_address_sand_reg[9][0]                     |                4 |             10 |
+|  instance_name/inst/clk_out2                                         | vga_dtg/pixel_row[9]_i_2_n_0                                           | vga_dtg/pixel_row[9]_i_1_n_0                           |                4 |             10 |
+|  instance_name/inst/clk_out2                                         | prvdr_inst/prvdr_pb_if/pixel_address_ovr_scrn_reg[9][0]                |                                                        |                4 |             11 |
+|  instance_name/inst/clk_out1                                         | prvdr_inst/PROVIDERCPU/t_state_0                                       | prvdr_inst/PROVIDERCPU/internal_reset                  |                3 |             12 |
+|  clk_BUFG                                                            |                                                                        |                                                        |                6 |             13 |
+|  instance_name/inst/clk_out2                                         |                                                                        | DB/SR[0]                                               |                8 |             13 |
+|  prvdr_inst/PROVIDER/instantiate_loader.jtag_loader_6_inst/shift_clk | prvdr_inst/PROVIDER/instantiate_loader.jtag_loader_6_inst/shift        |                                                        |                2 |             14 |
+|  kbrd/ps2/flag                                                       | kbrd/ps2/keycode[15]_i_1_n_0                                           |                                                        |                4 |             16 |
+|  instance_name/inst/clk_out1                                         | prvdr_inst/PROVIDERCPU/t_state_0                                       |                                                        |                2 |             16 |
+|  instance_name/inst/clk_out1                                         | prvdr_inst/PROVIDERCPU/register_enable                                 |                                                        |                2 |             16 |
+|  prvdr_inst/PROVIDER/instantiate_loader.jtag_loader_6_inst/shift_clk | prvdr_inst/PROVIDER/instantiate_loader.jtag_loader_6_inst/jtag_din_int |                                                        |                5 |             17 |
+|  instance_name/inst/clk_out2                                         |                                                                        |                                                        |                9 |             19 |
+|  instance_name/inst/clk_out1                                         | prvdr_inst/prvdr_pb_if/ScrllIncReg                                     |                                                        |                8 |             20 |
+|  instance_name/inst/clk_out2                                         | prvdr_inst/prvdr_pb_if/D[3]                                            |                                                        |                8 |             20 |
+|  instance_name/inst/clk_out1                                         |                                                                        | DB/db_count[31]_i_1_n_0                                |                8 |             31 |
+|  instance_name/inst/clk_out1                                         |                                                                        | prvdr_inst/prvdr_pb_if/clk_cnt[31]_i_1__0_n_0          |                8 |             31 |
+|  instance_name/inst/clk_out2                                         |                                                                        | icon/tgl_icn                                           |                8 |             31 |
+|  instance_name/inst/clk_out1                                         |                                                                        | DB/SR[0]                                               |               29 |             74 |
+|  int_upd_sysres_BUFG                                                 |                                                                        |                                                        |               37 |             97 |
+|  instance_name/inst/clk_out2                                         | prvdr_inst/prvdr_pb_if/icon_reg[1]                                     |                                                        |               38 |             97 |
+|  instance_name/inst/clk_out1                                         | prvdr_inst/prvdr_pb_if/E[0]                                            | DB/SR[0]                                               |               46 |            107 |
+|  instance_name/inst/clk_out1                                         |                                                                        |                                                        |               57 |            174 |
++----------------------------------------------------------------------+------------------------------------------------------------------------+--------------------------------------------------------+------------------+----------------+
+
+

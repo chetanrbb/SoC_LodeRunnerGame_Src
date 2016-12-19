@@ -1,0 +1,45 @@
+<!DOCTYPE MDSProject>
+<MDSProject>
+ <General>
+  <Name name="soc pr1"/>
+  <Family family="kcpsm6"/>
+  <Language language="0"/>
+  <ScratchpadSize value="256"/>
+  <ProgMemSize value="4096"/>
+  <IntVector value="1023"/>
+  <HWBuild value="0"/>
+  <AsmType value="0"/>
+ </General>
+ <Watchers/>
+ <Files>
+  <File path="../ece540s16_project2_release_r1_0/project2_release/rojobot.psm" opened="false" name="rojobot.psm"/>
+ </Files>
+ <Mainfile enabled="false" path="" name=""/>
+ <Breakpoints/>
+ <Bookmarks/>
+ <Simulator>
+  <Clock clockMult="1000000" clock="10"/>
+ </Simulator>
+ <Compiler>
+  <Options>
+   <SymbolTable enable="false"/>
+   <MacroTable enable="false"/>
+   <DebugFile enable="true"/>
+   <CodeTree enable="false"/>
+   <ListFile enable="false"/>
+   <HexFile enable="true"/>
+   <BinFile enable="false"/>
+   <SRecFile enable="false"/>
+   <MemFile enable="false"/>
+   <RawHexFile enable="false"/>
+   <VerilogFile enable="false"/>
+   <VHDLFile enable="false"/>
+  </Options>
+  <Depths macro="-1" repeat="-1" file="-1"/>
+  <Templates>
+   <VHDL default="true" path=""/>
+   <Verilog default="true" path=""/>
+  </Templates>
+  <IncludePaths/>
+ </Compiler>
+</MDSProject>

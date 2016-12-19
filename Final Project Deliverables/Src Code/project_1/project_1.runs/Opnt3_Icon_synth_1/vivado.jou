@@ -1,0 +1,12 @@
+#-----------------------------------------------------------
+# Vivado v2015.4 (64-bit)
+# SW Build 1412921 on Wed Nov 18 09:43:45 MST 2015
+# IP Build 1412160 on Tue Nov 17 13:47:24 MST 2015
+# Start of session at: Tue May 31 12:28:53 2016
+# Process ID: 6476
+# Current directory: E:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.runs/Opnt3_Icon_synth_1
+# Command line: vivado.exe -log Opnt3_Icon.vds -mode batch -messageDb vivado.pb -notrace -source Opnt3_Icon.tcl
+# Log file: E:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.runs/Opnt3_Icon_synth_1/Opnt3_Icon.vds
+# Journal file: E:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.runs/Opnt3_Icon_synth_1\vivado.jou
+#-----------------------------------------------------------
+source Opnt3_Icon.tcl -notrace

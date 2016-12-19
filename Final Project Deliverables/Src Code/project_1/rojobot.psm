@@ -1,0 +1,971 @@
+; -----------------------------------------------------------------
+; proj2demo.psm - Demo program for Rojobot "world" emulator
+;
+; Version:	4.0
+; Author:	Roy Kravitz
+; Date:		12-Oct-2014
+;
+; Revision History
+; ================
+; 11-Jan-07		RK		Created the first version
+; 12-Jan-09		RK		Modified for S3E Starter Board and Seven Segment Emulator
+; 16-Oct-09		RK		Minor changes (comments) for PSU ECE510 
+; 24-Oct-11		RK		Minor changes (comments) 
+; 24-Oct-12		RK		Modified for kcpsm6 and Nexys 3
+; 03-Jan-14		RK		Refactored as Project1 demo for ECE 540 Winter 2014 and later
+; 26-Jan-14		RK		Fixed bug in Interrupt handler.  S5 and S6 were inadvertently swapped
+;						Thanks to Jason Dutra for pointing this out.
+; 11-Oct-14		RK		Refactored as Project 2 demo for ECE 540 Fall 2014 and later.  Includes
+;						support for Nexys4 and Vivado, including a workaround for a bug in the
+;						Vivdao hardware manager (2014.2) pointed out by Ken Chapman.  The bug
+;						corrupts location 3 of the ROM so the code is written to avoid that location
+; 12-Oct-14		RK		Modified code to take advantage of the 8 digit Nexys4 (vs. 4 on the Nexys3) display
+;
+; Description:
+; ============
+; This program demonstrate the Rojobot world emulator.  It is modelled after
+; the the Verilog Rojobot implemented in the Getting Started application only this demo is based
+; on the full Rojobot emulator (as implemented in bot.v instead of the simplified
+; Rojobot model used in the Getting Started project
+;
+; The demo uses the 4 pushbuttons to control the Rojobot as follows:
+;	btn_left	- Left Motor forward
+; 	btn_up		- Left Motor reverse
+;	btn_right	- Right Motor forward
+;	btn_down	- Right Motor reverse
+; If neither of the two buttons that control each motor is pushed, then the motor is stopped. 
+; If both of the two buttons that control each motor are pushed, the actions cancel each other
+; leaving the motor stopped.
+;
+; The demo takes advantage of the wider display on the Nexys4 (8 digits vs. 4) to
+; make the rojobot state easier for follow. The digits are mapped as follows:
+;	digit[7:5] - compass heading
+;	digit[4] - movement (Fwd, Rev, Stopped, turning)
+;	digits[2:1] - column position (X) in hex
+;	digits[1:0] - row position (Y) in hex
+;
+; Decimal points 5 and 4 are turned on to highlight the movement display.  Decimal point 0 toggles
+; on and off every interrupt (~every 100 msec w/ updt_sysregs)
+	
+; The sensors are displayed on the LEDs in both display modes.
+; Decimal point 0 toggles on and off every interrupt (~every 100 msec w/ updt_sysregs)
+;
+; NOTE:  NOT ALL THE CODE IN THIS EXAMPLE IS USED.  THE EXAMPLE WAS CREATED TO GIVE YOU, THE
+; STUDENT, AN EXAMPLE OF HOW TO CONTROL THE ROJOBOT AND NEXYS4 PERIPHERALS FROM AN EMBEDDED PICOBLAZE
+; CPU. YOU MAY (OR NOT) FIND SOME OF THIS CODE APPLICABLE TO YOUR OTHER PROJECTS
+;
+; -----------------------------------------------------------------	
+
+; ============================================
+; === Register Names                       ===
+; === s6 - s0 registers are not dedicated  ===
+; === and keep their default names         ===
+; ============================================
+NAMEREG		sF,		LocX			; rojobot location - x coordinate
+NAMEREG		sE,		LocY			; rojobot location - y coordinate
+NAMEREG		sD,		Sensor			; rojobot sensor values
+NAMEREG		sC,		Botinf			; rojobot movement and orientation values
+NAMEREG		sB,		MVst			; state variable for movement indicator
+									;
+									; Dig7, Dig6, Dig5 and Dig4 are stored in the scratchpad
+									; RAM to keep the changes to minimum
+NAMEREG		sA,		Dig3			; 7-segment display digit 3
+NAMEREG		s9,		Dig2			; 7-segment display digit 2
+NAMEREG		s8,		Dig1			; 7-segment display digit 1
+NAMEREG		s7,		Dig0			; 7-segment display digit 0
+
+
+; ======================
+; === Port Addresses ===
+; ======================
+
+; Nexys 4 board base I/O interface ports compatible with the Nexys3 I/O interface
+;  Port Addresses
+CONSTANT	PA_PBTNS,		00		; (i) pushbuttons inputs
+CONSTANT	PA_SLSWTCH,		01		; (i) slide switches
+CONSTANT	PA_LEDS,		02		; (o) LEDs
+CONSTANT	PA_DIG3,		03		; (o) digit 3 port address
+CONSTANT	PA_DIG2,		04		; (o) digit 2 port address
+CONSTANT	PA_DIG1,		05		; (o) digit 1 port address
+CONSTANT	PA_DIG0,		06		; (o) digit 0 port address
+CONSTANT	PA_DP,			07		; (o) decimal points 3:0 port address
+CONSTANT	PA_RSVD,		08		; (o) *RESERVED* port address
+
+
+; Rojobot interface registers
+CONSTANT	PA_MOTCTL_IN,	09		; (o) Rojobot motor control output from system
+CONSTANT	PA_LOCX,		0A		; (i) X coordinate of rojobot location
+CONSTANT	PA_LOCY,		0B		; (i))Y coordinate of rojobot location
+CONSTANT	PA_BOTINFO,		0C		; (i) Rojobot info register
+CONSTANT	PA_SENSORS,		0D		; (i) Sensor register
+CONSTANT	PA_LMDIST,		0E		; (i) Rojobot left motor distance register
+CONSTANT	PA_RMDIST,		0F		; (i) Rojobot right motor distance register
+
+; Extended I/O interface port addresses for the Nexys4.  Your Nexys4_Bot interface module
+; should include these additional ports even though they are not used in this program
+CONSTANT	PA_PBTNS_ALT,	10		; (i) pushbutton inputs alternate port address
+CONSTANT	PA_SLSWTCH1508,	11		; (i) slide switches 15:8 (high byte of switches
+CONSTANT	PA_LEDS1508,	12		; (o) LEDs 15:8 (high byte of switches)
+CONSTANT	PA_DIG7,		13		; (o) digit 7 port address
+CONSTANT	PA_DIG6,		14		; (o) digit 6 port address
+CONSTANT	PA_DIG5,		15		; (o) digit 5 port address
+CONSTANT	PA_DIG4,		16		; (o) digit 4 port address
+CONSTANT	PA_DP0704,		17		; (o) decimal points 7:4 port address
+CONSTANT	PA_RSVD_ALT,	18		; (o) *RESERVED* alternate port address
+
+; Extended Rojobot interface registers.  These are alternate Port addresses
+CONSTANT	PA_MOTCTL_IN_ALT,	19	; (o) Rojobot motor control output from system
+CONSTANT	PA_LOCX_ALT,		1A	; (i) X coordinate of rojobot location
+CONSTANT	PA_LOCY_ALT,		1B	; (i))Y coordinate of rojobot location
+CONSTANT	PA_BOTINFO_ALT,		1C	; (i) Rojobot info register
+CONSTANT	PA_SENSORS_ALT,		1D	; (i) Sensor register
+CONSTANT	PA_LMDIST_ALT,		1E	; (i) Rojobot left motor distance register
+CONSTANT	PA_RMDIST_ALT,		1F	; (i) Rojobot right motor distance register
+
+
+; =====================================
+; === Register bit mappings (masks) ===
+; =====================================
+	
+;  bit masks for pushbuttons and switches for seven segment emulator
+CONSTANT	MSK_ALLBTNS,	1F		; Buttons are in bits[5:0]
+CONSTANT	MSK_PBTNS,		0F		; Mask for 4 buttons to display on LED
+CONSTANT	MSK_BTN_CENTER,	10		; Pushbutton Center is bit 4
+CONSTANT	MSK_BTN_LEFT,	08		; Pushbutton Left is bit 3
+CONSTANT	MSK_BTN_UP,		04		; Pushbutton Up is bit 2
+CONSTANT	MSK_BTN_RIGHT,	02		; Pushbutton Right is bit 1
+CONSTANT	MSK_BTN_DOWN,	01		; Pushbutton Down is bit 0
+
+CONSTANT	MSK_ALLSW_LO,	FF		; Slide switches are in bits[7:0] of PA_SLSWTCH_07_00
+CONSTANT	MSK_ALLSW_HI,	FF		; Slide switchees are in bits[7:0] of PA_SLSWTCH_15_08
+CONSTANT	MSK_SW7,		80		; Slide switch 7 is bit 7
+CONSTANT	MSK_SW6,		40		; Slide switch 6 is bit 6
+CONSTANT	MSK_SW5,		20		; Slide switch 5 is bit 5
+CONSTANT	MSK_SW4,		10		; Slide switch 4 is bit 4
+CONSTANT	MSK_SW3,		08		; Slide switch 3 is bit 3
+CONSTANT	MSK_SW2,		04		; Slide switch 2 is bit 2
+CONSTANT	MSK_SW1,		02		; Slide switch 1 is bit 1
+CONSTANT	MSK_SW0,		01		; Slide switch 0 is bit 0
+
+CONSTANT	MSK_SW15,		80		; Slide switch 15 is bit 7
+CONSTANT	MSK_SW14,		40		; Slide switch 14 is bit 6
+CONSTANT	MSK_SW13,		20		; Slide switch 13 is bit 5
+CONSTANT	MSK_SW12,		10		; Slide switch 12 is bit 4
+CONSTANT	MSK_SW11,		08		; Slide switch 11 is bit 3
+CONSTANT	MSK_SW10,		04		; Slide switch 10 is bit 2
+CONSTANT	MSK_SW09,		02		; Slide switch 09 is bit 1
+CONSTANT	MSK_SW08,		01		; Slide switch 08 is bit 0
+
+
+; bit mask for LEDs
+CONSTANT	MSK_LEDS_LO,	FF		; Mask for rightmost 8 LEDs on the Nexys4
+CONSTANT	MSK_LEDS_HI,	FF		; Mask for the lefmost 8 LEDs on the Nexys4
+
+
+; bit mask for display character codes and decimal points
+CONSTANT	MSK_CCODE,		1F		; Character codes are in lower 5 bits
+CONSTANT	MSK_DECPTS,		0F		; Decimal points 3 - 0 are in bits 3 to 0
+CONSTANT	MSK_DECPTS_HI,	0F		; Decimal points 7-4 are in bits 3 to 0
+CONSTANT	MSK_HEXDIGIT,	0F		; Hex digits only take 4 bits
+
+
+; nibble masks
+CONSTANT	MSKLOWNIB,		0F		; Mask out high nibble of byte
+CONSTANT	MSKHIGHNIB,		F0		; Mask out low nibble of byte
+CONSTANT	INVLOWNIB,		0F		; Invert low nibble of byte
+
+
+; =============================
+; === Useful Data Constants ===
+; =============================
+
+;  Constants for True and False and Null
+CONSTANT	FALSE,			00
+CONSTANT	TRUE,			01
+CONSTANT	NULL,			00
+
+; Character code table for special characters
+; Decimal digits 0 to 15 display '0'to 'F'
+CONSTANT	CC_BASE,		10		; Base value for special characters
+CONSTANT	CC_SEGBASE,		10		; Base value for segment display special characters
+									;				 abcdefg
+CONSTANT	CC_SEGA,		10		; Segment A		[1000000]
+CONSTANT	CC_SEGB,		11		; Segment B		[0100000]
+CONSTANT	CC_SEGC,		12		; Segment C		[0010000]
+CONSTANT	CC_SEGD,		13		; Segment D		[0001000]
+CONSTANT	CC_SEGE,		14		; Segment E		[0000100]
+CONSTANT	CC_SEGF,		15		; Segment F		[0000010]
+CONSTANT	CC_SEGG,		16		; Segment G		[0000001]
+CONSTANT	CC_DOT,			17		; Dot (period)
+CONSTANT	CC_UCH,			18		; Upper Case H
+CONSTANT	CC_UCL,			19		; Upper Case L
+CONSTANT	CC_UCR,			1A		; Upper Case R
+CONSTANT	CC_LCL,			1B		; Lower Case L
+CONSTANT	CC_LCR,			1C		; Lower Case R
+CONSTANT	CC_SPACE1,		1D		; Space (blank)
+CONSTANT	CC_SPACE2,		1E		; Space (blank)
+CONSTANT	CC_SPACE,		1F		; Space (blank)
+
+
+; ======================
+; === BotInfo values ===
+; ======================
+CONSTANT	OR_N,			00		; Orientation is North
+CONSTANT	OR_NE,			01		; Orientation is Northeast
+CONSTANT	OR_E,			02		; Orientation is East
+CONSTANT	OR_SE,			03		; Orientation is Southeast
+CONSTANT	OR_S,			04		; Orientation is South
+CONSTANT	OR_SW,			05		; Orientation is Southwest
+CONSTANT	OR_W,			06		; Orientation is West
+CONSTANT	OR_NW,			07		; Orientation is Northwest
+
+CONSTANT	MV_STOP,		00		; Movement is stopped
+CONSTANT	MV_FWD,			04		; Movement is forward
+CONSTANT	MV_REV,			08		; Movement is reverse
+CONSTANT	MV_SLT,			0C		; Movement is slow left turn
+CONSTANT	MV_FLT,			0D		; Movement is fast left turn
+CONSTANT	MV_SRT,			0E		; Movement is slow right turn
+CONSTANT	MV_FRT,			0F		; Movement is fast right turn
+									; Next 2 contants assume field is in low nibble
+CONSTANT	MSKMVMT,	0F			; Mask out all but movement bits
+CONSTANT	MSKORIENT,	07			; Mask out all but orientation bits
+
+
+
+; =================================
+; === Scratch Pad RAM Variables ===
+; =================================
+
+; Pushbutton translation lookup table.  Converts pushbutton combos
+; to Motor Control input register format [lmspd[2:0],lmdir,rmspd[2:0],rmdir]
+CONSTANT	SP_BTNBASE,	00			; table is based at 0x00
+									;								[b3,b2,b1,b0]=[lf,lr,rf,rr]
+CONSTANT	SP_LSRS,		00		; left motor off, right motor off 				[0000]
+CONSTANT	SP_LORR,		02		; left motor off, right motor reverse			[0001]
+CONSTANT	SP_LSRF,		03		; left motor off, right motor forward			[0010]
+CONSTANT	SP_LSRFR,		00		; left motor off, right motor fwd & rev = off	[0011]
+CONSTANT	SP_LRRS,		20		; left motor reverse, right motor off			[0100]
+CONSTANT	SP_LRRR,		22		; left motor reverse, right motor reverse		[0101]
+CONSTANT	SP_LRRF,		23		; left motor reverse, right motor forward		[0110]
+CONSTANT	SP_LRRFR,		20		; left motor rev, right motor fwd & rev = off	[0111]
+CONSTANT	SP_LFRS,		30		; left motor forward, right motor off 			[1000]
+CONSTANT	SP_LFRR,		32		; left motor forward, right motor reverse		[1001]
+CONSTANT	SP_LFRF,		33		; left motor forward, right motor forward		[1010]
+CONSTANT	SP_LFRFR,		30		; left motor fwd, right motor fwd & rev = off	[1011]
+CONSTANT	SP_LFRRS,		00		; left motor fwd & rev = off, right motor off	[1100]
+CONSTANT	SP_LFRRR,		02		; left motor fwd & rev = off, right motor rev	[1101]
+CONSTANT	SP_LFRRF,		03		; left motor fwd & rev = off, right motor fwd	[1110]
+CONSTANT	SP_LFRRFR,		00		; left  and right motor fwd & rev = off			[1111]
+
+
+; Movement display lookup table.  Converts movement from BotInfo register to
+; the character code to display.  Not very dense but we have the room in the SP RAM and 
+; it saves building a switch statement into the code.
+CONSTANT	SP_MVMTBASE,	10			; table is based at 0x10
+
+CONSTANT	SP_MVMT0,		18		; Stopped - display upper case H
+CONSTANT	SP_MVMT1,		17		; Reserved - display dot to indicate error
+CONSTANT	SP_MVMT2,		17		; Reserved - display dot to indicate error
+CONSTANT	SP_MVMT3,		17		; Reserved - display dot to indicate error
+CONSTANT	SP_MVMT4,		0F		; Forward - display upper case F
+CONSTANT	SP_MVMT5,		17		; Reserved - display dot to indicate error
+CONSTANT	SP_MVMT6,		17		; Reserved - display dot to indicate error
+CONSTANT	SP_MVMT7,		17		; Reserved - display dot to indicate error
+CONSTANT	SP_MVMT8,		0B		; Reverse (Backward) - display lower case B
+CONSTANT	SP_MVMT9,		17		; Reserved - display dot to indicate error
+CONSTANT	SP_MVMTA,		17		; Reserved - display dot to indicate error
+CONSTANT	SP_MVMTB,		17		; Reserved - display dot to indicate error
+CONSTANT	SP_MVMTC,		19		; Slow left turn - display upper case L
+CONSTANT	SP_MVMTD,		1B		; Fast left turn - display lower case L
+CONSTANT	SP_MVMTE,		1A		; Slow right turn - display upper case R
+CONSTANT	SP_MVMTF,		1C		; Fast right turn - display lower case R
+
+
+; ==============================
+; === Storage for old values ===
+; ==============================
+CONSTANT	SP_SEM,			20		; Semaphore between isr and main loop
+CONSTANT	SP_TEMP1,		21		; Temp storage.  Used by ISR
+CONSTANT	SP_TEMP2,		22		;
+CONSTANT	SP_LMDIST,		23		; Storage for left and right motor distance counters
+CONSTANT	SP_RMDIST,		24		;
+CONSTANT	SP_OLDMVMT,		25		; Old movement value 
+CONSTANT	SP_OLDHDG,		26		; Old heading value
+CONSTANT	SP_OLDDP,		27		; Old decimal points
+
+; =========================
+; === Digits 7, 6, 5, 4 ===
+;==========================
+CONSTANT	SP_DIG7,		30		; Digit[7:4] contain the BOT heading
+CONSTANT	SP_DIG6,		31		;
+CONSTANT	SP_DIG5,		32		;
+CONSTANT	SP_DIG4,		33		;
+
+; =========================
+; === Orientation ===
+;==========================
+CONSTANT	ORG_ORNT		28
+CONSTANT	REV_ORNT		29
+CONSTANT	TURNC			2A 
+CONSTANT 	ORNT_BASE_TABLE 35
+CONSTANT 	NORTH			0
+CONSTANT 	SOUTH 			4
+CONSTANT 	EAST			2
+CONSTANT	WEST			6
+CONSTANT	NORTHEAST		1 
+CONSTANT	NORTHWEST		7
+CONSTANT	SOUTHEAST		3 
+CONSTANT	SOUTHWEST		5 
+
+; ===============
+; === main()  ===
+; ===============
+
+ADDRESS	000
+				JUMP	main						; workaround to avoid location 3 corruption
+				JUMP	main						; by Vivado Hardware Manager.  Bug was flagged by
+				JUMP	main						; Ken Chapman and is known to be in 2014.2
+				JUMP	main						; Address 003 can be corrupted by Vivado HW manager
+													;
+main:			CALL	init_btnluptbl				; initialize button to MotCtl lookup table
+				CALL	init_mvmttbl				; initialize movement to character code lookup table
+				CALL 	init_rev_ornt_tbl			; initialize reverse orientation lookup table 
+				LOAD	s1,		00					; clear the semaphore
+				STORE	s1,		SP_SEM				;
+				LOAD	s1,		00					; turn off decimal points 3-0.  Decimal point 0 (rightmost
+				STORE	s1,		SP_OLDDP			; and save the value	
+				CALL	SS_wrdpts					; will be toggled in the interrupt handler
+				LOAD	s1,		03					; turn on decimal points 5 and 4 to offset the movement digit
+				CALL	SS_wrdpts_hi				; we don't need to save this value because these decimal points don't change
+				ENABLE	INTERRUPT					; get the ball rolling
+									
+
+; ==================
+; === Main  Loop ===
+; ==================
+													;	while(1) {  // main loop is an infinite loop
+main_L0:		FETCH	s6,		SP_SEM				;		while (SP_SEMA == 0)  {}   // loop until isr updates rojobot registers
+				COMPARE	s6,		00				;
+				JUMP	Z,		main_L0				;
+				CALL	next_loc					;			Dig[3:2] = nex LocX; Dig[1:0] = next LocY
+				CALL	next_mvmt					;			Dig[4] = next movement
+				CALL	next_hdg					;			Dig[7:4] = next heading
+													;		}
+main_L2:		CALL	wr_alldigits				;		write all of the digits to the display
+				LOAD	s1,		Sensor				;		update LEDs with new sensor information
+				CALL	LED_wrleds					;
+				CALL	next_step					;		tell rojobot what to do next
+				FETCH	s6,		SP_SEM
+				SUB	s6,		01					;		decrement semaphore
+				STORE	s6,		SP_SEM				;
+				JUMP	main_L0						;	} // end - main while loop	
+				
+													
+								
+			
+;**************************************************************************************
+; Support functions
+;**************************************************************************************	
+
+; ===============================================================================
+; === wr_alldigits() - Writes all 8 display digits from the global locations  ===
+; === Registers used s0,s1,s2, Dig0, Dig1, Dig2, Dig3                         ===
+; --- Scratchpad RAM locations used SP_DIG4, SP_DIG5, SP_DIG6, SP_DIG7        ===
+; ===============================================================================
+
+wr_alldigits:										; Digits 0 to 3 are stored in registers	
+													; and written to the didsplay with SS_wdigx()
+				LOAD	s2,			00				; point at digit 0
+				LOAD	s1,			Dig0			; and write it to display
+				CALL	SS_wrdigx					;
+				LOAD	s2,			01				; point at digit 1
+				LOAD	s1,			Dig1			; and write it to display
+				CALL	SS_wrdigx					;
+				LOAD	s2,			02				; point at digit 2
+				LOAD	s1,			Dig2			; and write it to display
+				CALL	SS_wrdigx					;
+				LOAD	s2,			03				; point at digit 3
+				LOAD	s1,			Dig3			; and write it to the display
+				CALL	SS_wrdigx					;
+													; Digits 4 to 7 are stored in the Scratchpad RAM
+													; and written to the display with SS_wdigx_hi()
+				LOAD	s2,			04				; point at digit 4
+				FETCH	s1,			SP_DIG4			; and write it to the display
+				CALL	SS_wrdigx_hi				;
+				LOAD	s2,			05				; point at digit 5
+				FETCH	s1,			SP_DIG5			; and write it to the display
+				CALL	SS_wrdigx_hi				;
+				LOAD	s2,			06				; point at digit 6
+				FETCH	s1,			SP_DIG6			; and write it to the display
+				CALL	SS_wrdigx_hi				;
+				LOAD	s2,			07				; point at digit 7
+				FETCH	s1,			SP_DIG7			; and write it to the display
+				CALL	SS_wrdigx_hi				;				
+				RETURN
+				
+
+; ==========================================================================================
+; === init_rev_ornt_lookuptable() - initialize lookup table for the reverse orientation in SP RAM ===
+; === Registers affected: s0, s1                                              			 ===
+; ==========================================================================================
+init_rev_ornt_tbl: LOAD s0, 		SP_REV_ORNT_BASE				
+				LOAD	s1, 		SOUTH			;; rev of north 
+				STORE	s1, 		(s0)			; store @ 0x35
+				ADD 	s0, 		1 				; increment the address of the base pointer of look up table
+				
+				LOAD 	s1, 		SOUTHWEST
+				STORE	s1,			(s0)
+				ADD		s0,			1
+				
+				LOAD	s1, 		WEST
+				STORE	s1,			(s0)
+				ADD		s0,			1
+				
+				LOAD	s1, 		NORTHWEST
+				STORE	s1,			(s0)
+				ADD 	s0, 		1
+				
+				LOAD 	s1, 		NORTH
+				STORE	s1, 		(s0)
+				ADD		s0, 		1
+				
+				LOAD 	s1,		 	NORTHEAST
+				STORE	s1,			(s0)
+				ADD 	s0, 		1
+				
+				LOAD 	s1, 		EAST
+				STORE	s1, 		(s0)
+				ADD 	s0, 		1
+				
+				LOAD 	s1, 		SOUTHEAST
+				STORE	s1, 		(s0)
+				
+				RETURN 
+				
+;*******
+; Functions to convert pushbutton presses to Motor Control input
+;*******				
+
+; ===============================================================================
+; === init_btnluptbl() - initialize button translation lookup table in SP RAM ===
+; === Registers affected: s0, s1                                              ===
+; ===============================================================================
+init_btnluptbl:	LOAD	s0,		SP_BTNBASE			; s0 gets base of button translation lookup table
+				LOAD	s1,		SP_LSRS				; s1 gets values for 0x00								
+				STORE	s1,		(s0)				; store the entry in the table
+				ADD	s0,		01					; increment the table index
+				LOAD	s1,		SP_LORR				; s1 gets values for 0x01								
+				STORE	s1,		(s0)				; store the entry in the table
+				ADD	s0,		01					; increment the table index				
+				LOAD	s1,		SP_LSRF				; s1 gets values for 0x02								
+				STORE	s1,		(s0)				; store the entry in the table
+				ADD	s0,		01					; increment the table index
+				LOAD	s1,		SP_LSRFR			; s1 gets values for 0x03								
+				STORE	s1,		(s0)				; store the entry in the table
+				ADD	s0,		01					; increment the table index	
+				LOAD	s1,		SP_LRRS				; s1 gets values for 0x04								
+				STORE	s1,		(s0)				; store the entry in the table
+				ADD	s0,		01					; increment the table index
+				LOAD	s1,		SP_LRRR				; s1 gets values for 0x05							
+				STORE	s1,		(s0)				; store the entry in the table
+				ADD	s0,		01					; increment the table index				
+				LOAD	s1,		SP_LRRF				; s1 gets values for 0x06								
+				STORE	s1,		(s0)				; store the entry in the table
+				ADD	s0,		01					; increment the table index
+				LOAD	s1,		SP_LRRFR			; s1 gets values for 0x07								
+				STORE	s1,		(s0)				; store the entry in the table
+				ADD	s0,		01					; increment the table index
+				LOAD	s1,		SP_LFRS				; s1 gets values for 0x08								
+				STORE	s1,		(s0)				; store the entry in the table
+				ADD	s0,		01					; increment the table index
+				LOAD	s1,		SP_LFRR				; s1 gets values for 0x09								
+				STORE	s1,		(s0)				; store the entry in the table
+				ADD	s0,		01					; increment the table index				
+				LOAD	s1,		SP_LFRF				; s1 gets values for 0x0A								
+				STORE	s1,		(s0)				; store the entry in the table
+				ADD	s0,		01					; increment the table index
+				LOAD	s1,		SP_LFRFR			; s1 gets values for 0x0B								
+				STORE	s1,		(s0)				; store the entry in the table
+				ADD	s0,		01					; increment the table index	
+				LOAD	s1,		SP_LFRRS			; s1 gets values for 0x0C								
+				STORE	s1,		(s0)				; store the entry in the table
+				ADD	s0,		01					; increment the table index
+				LOAD	s1,		SP_LFRRR			; s1 gets values for 0x0D							
+				STORE	s1,		(s0)				; store the entry in the table
+				ADD	s0,		01					; increment the table index				
+				LOAD	s1,		SP_LFRRF			; s1 gets values for 0x0E								
+				STORE	s1,		(s0)				; store the entry in the table
+				ADD	s0,		01					; increment the table index
+				LOAD	s1,		SP_LFRRFR			; s1 gets values for 0x0F								
+				STORE	s1,		(s0)				; store the entry in the table
+				RETURN								; done...at last			
+				
+
+; =============================================================================
+; === btn2mot() - Button to MotCtl conversion function                      ===
+; === Registers affected: s1, s2                                            ===
+; === s0 contains the button value to convert.                              ===
+; === Result (Motor Control register value) is returned in s1               ===
+; === s0 (Button value) is not changed                                      ===
+; =============================================================================
+btn2mot:		LOAD	s2,		SP_BTNBASE			; s2 gets base of button conversion table
+				LOAD	s1,		s0					; mask out upper nibble of buttons
+				AND	s1,		MSKLOWNIB			; 
+				ADD	s2,		s1					; s2 = Base + offset into table		
+				FETCH	s1,		(s2)				; and fetch the entry
+				RETURN															
+
+				
+; ===============================================================================
+; === init_mvmttbl() - initialize movement translation lookup table in SP RAM ===
+; === Registers affected: s0, s1                                              ===
+; ===============================================================================
+init_mvmttbl:	LOAD	s0,		SP_MVMTBASE			; s0 gets base of movement translation lookup table
+				LOAD	s1,		SP_MVMT0			; s1 gets values for 0x00								
+				STORE	s1,		(s0)				; store the entry in the table
+				ADD	s0,		01					; increment the table index
+				LOAD	s1,		SP_MVMT1			; s1 gets values for 0x01								
+				STORE	s1,		(s0)				; store the entry in the table
+				ADD	s0,		01					; increment the table index				
+				LOAD	s1,		SP_MVMT2			; s1 gets values for 0x02								
+				STORE	s1,		(s0)				; store the entry in the table
+				ADD	s0,		01					; increment the table index
+				LOAD	s1,		SP_MVMT3			; s1 gets values for 0x03								
+				STORE	s1,		(s0)				; store the entry in the table
+				ADD	s0,		01					; increment the table index	
+				LOAD	s1,		SP_MVMT4			; s1 gets values for 0x04								
+				STORE	s1,		(s0)				; store the entry in the table
+				ADD	s0,		01					; increment the table index
+				LOAD	s1,		SP_MVMT5			; s1 gets values for 0x05							
+				STORE	s1,		(s0)				; store the entry in the table
+				ADD	s0,		01					; increment the table index				
+				LOAD	s1,		SP_MVMT6			; s1 gets values for 0x06								
+				STORE	s1,		(s0)				; store the entry in the table
+				ADD	s0,		01					; increment the table index
+				LOAD	s1,		SP_MVMT7			; s1 gets values for 0x07								
+				STORE	s1,		(s0)				; store the entry in the table
+				ADD	s0,		01					; increment the table index
+				LOAD	s1,		SP_MVMT8			; s1 gets values for 0x08								
+				STORE	s1,		(s0)				; store the entry in the table
+				ADD	s0,		01					; increment the table index
+				LOAD	s1,		SP_MVMT9			; s1 gets values for 0x09								
+				STORE	s1,		(s0)				; store the entry in the table
+				ADD	s0,		01					; increment the table index				
+				LOAD	s1,		SP_MVMTA			; s1 gets values for 0x0A								
+				STORE	s1,		(s0)				; store the entry in the table
+				ADD	s0,		01					; increment the table index
+				LOAD	s1,		SP_MVMTB			; s1 gets values for 0x0B								
+				STORE	s1,		(s0)				; store the entry in the table
+				ADD	s0,		01					; increment the table index	
+				LOAD	s1,		SP_MVMTC			; s1 gets values for 0x0C								
+				STORE	s1,		(s0)				; store the entry in the table
+				ADD	s0,		01					; increment the table index
+				LOAD	s1,		SP_MVMTD			; s1 gets values for 0x0D							
+				STORE	s1,		(s0)				; store the entry in the table
+				ADD	s0,		01					; increment the table index				
+				LOAD	s1,		SP_MVMTE			; s1 gets values for 0x0E								
+				STORE	s1,		(s0)				; store the entry in the table
+				ADD	s0,		01					; increment the table index
+				LOAD	s1,		SP_MVMTF			; s1 gets values for 0x0F								
+				STORE	s1,		(s0)				; store the entry in the table
+				RETURN								; done...at last			
+				
+
+; =============================================================================
+; === mvmt2cc() - movement to character code conversion function            ===
+; === Registers affected: s1, s2                                            ===
+; === s0 contains the movment value to convert.                             ===
+; === Result (character code to display) is returned in s1                  ===
+; === s0 (movement) is not changed                                          ===
+; =============================================================================
+mvmt2cc:		LOAD	s2,		SP_MVMTBASE			; s2 gets base of movment conversion table
+				LOAD	s1,		s0					; mask out upper nibble of movment
+				AND	s1,		MSKLOWNIB			; 
+				ADD	s2,		s1					; s2 = Base + offset into table		
+				FETCH	s1,		(s2)				; and fetch the entry
+				RETURN															
+
+				
+;#########################################
+; Modify this function for Project 2 #####	
+;#########################################			
+			
+; ========================================================================
+; === next_mvmt() - Calculate  digit for motion indicator              ===
+; === Registers affected: Dig3, s0                                     ===
+; === Uses Botinf (Bot Info register) to get movement.                 ===
+; ========================================================================				
+next_mvmt:		LOAD	s0,		Botinf				; s0[3:0] = Botinf[7:4]
+				SR0	s0							; 
+				SR0	s0							;
+				SR0	s0							;
+				SR0	s0							;
+				CALL	mvmt2cc						; translate movement to char code
+				STORE	s1,		SP_DIG4				; and move to digit 4.
+				RETURN							; digit 4 is in the scratchpad RAM				
+								
+
+; ==============================================================================
+; === next_hdg() - Calculate  digits for heading (compass setting)           ===
+; === Registers affected: Dig2, Dig1, Dig0, s0, s1, s2, s3,s4, s5, s6        ===
+; === Uses Botinf (Bot Info register) to get orientation.  Calculates digits ===
+; === with a case statement based on orientation.                            ===  
+; ==============================================================================				
+next_hdg:		LOAD	s0,		Botinf				; s0[2:0] = Botinf[2:0] = orientation
+				AND		s0,		MSKORIENT			; 
+													; switch(orientation)  {
+nh_caseORN:		COMPARE	s0,		OR_N			;	case(OR_N):
+				JUMP	NZ,		nh_caseORNE			; 
+				LOAD	s4,		00					;		Dig[2:0] = 000
+				LOAD	s5,		00					;
+				LOAD	s6,		00					;
+				JUMP	nh_endcase					;		break;
+													;
+nh_caseORNE:	COMPARE	s0,		OR_NE			;	case (OR_NE):
+				JUMP	NZ,		nh_caseORE			;
+				LOAD	s4,		00					;		Dig[2:0] = 045
+				LOAD	s5,		04					;
+				LOAD	s6,		05					;				
+				JUMP	nh_endcase					;		break;
+								
+nh_caseORE:		COMPARE	s0,		OR_E			;	case (OR_E):
+				JUMP	NZ,		nh_caseORSE			;
+				LOAD	s4,		00					;		Dig[2:0] = 090
+				LOAD	s5,		09					;
+				LOAD	s6,		00					;
+				JUMP	nh_endcase					;		break;						
+
+nh_caseORSE:	COMPARE	s0,		OR_SE			;	case (OR_SE):
+				JUMP	NZ,		nh_caseORS			;
+				LOAD	s4,		01					;		Dig[2:0] = 135
+				LOAD	s5,		03					;
+				LOAD	s6,		05					;
+				JUMP	nh_endcase					;		break;						
+
+nh_caseORS:		COMPARE	s0,		OR_S			;	case (OR_S):
+				JUMP	NZ,		nh_caseORSW			;
+				LOAD	s4,		01					;		Dig[2:0] = 180
+				LOAD	s5,		08					;
+				LOAD	s6,		00					;
+				JUMP	nh_endcase					;		break;						
+
+nh_caseORSW:	COMPARE	s0,		OR_SW			;	case (OR_SW):
+				JUMP	NZ,		nh_caseORW			;
+				LOAD	s4,		02					;		Dig[2:0] = 225
+				LOAD	s5,		02					;
+				LOAD	s6,		05					;
+				JUMP	nh_endcase					;		break;						
+				
+nh_caseORW:		COMPARE	s0,		OR_W			;	case (OR_W):
+				JUMP	NZ,		nh_caseORNW			;
+				LOAD	s4,		02					;		Dig[2:0] = 270
+				LOAD	s5,		07					;
+				LOAD	s6,		00					;
+				JUMP	nh_endcase					;		break;						
+				
+													;	case (OR_NW):  // only remaining case
+nh_caseORNW:	LOAD	s4,		03					;		Dig[2:0] = 315
+				LOAD	s5,		01					;
+				LOAD	s6,		05					;
+													; } // end of switch statement
+nh_endcase:		STORE	s4,		SP_DIG7				; update the heading display digits
+				STORE	s5,		SP_DIG6				; these are stored in the Scratchpad RAM
+				STORE	s6,		SP_DIG5				;
+				RETURN	
+			
+
+; ==============================================================================
+; === next_loc() - Calculate digits for Rojobot location                     ===
+; === Registers affected: Dig3, Dig2, Dig1, Dig0, s0                         ===
+; === Uses LocX and LocY to get location.                                    ===  
+; ==============================================================================
+next_loc:		LOAD		s0,		LocX				; Dig[3:2] gets X-coordinate
+				LOAD		Dig2,	s0					; Digit 2 gets lower nibble
+				AND		Dig2,	MSK_HEXDIGIT		;
+				SR0		s0							; Digit3 gets upper nibble
+				SR0		s0							; 
+				SR0		s0							; 
+				SR0		s0							;	
+				LOAD		Dig3,	s0					;
+				
+				LOAD		s0,		LocY				; Dig[1:0] gets Y-coordinate
+				LOAD		Dig0,	s0					; Digit 0 gets lower nibble
+				AND		Dig0,	MSK_HEXDIGIT		; 
+				SR0		s0							; Digit 1 gets upper nibble
+				SR0		s0							;
+				SR0		s0							;
+				SR0		s0							;	
+				LOAD		Dig1,	s0					;
+				RETURN					
+
+
+;#########################################
+; Modify this function for Project 2 #####	
+;#########################################					
+
+; ==============================================================================
+; === next_step() - Tells rojobot what to do next                            ===    
+; === Registers affected: s0, s1                                             ===
+; === This version reads the pushbuttons, calculates the new Motor Control   ===
+; === register value and then writes MotCtl so Rojobot knows what to do      ===  
+; ==============================================================================
+next_step:		;CALL		DEB_rdbtns					; Read the pushbuttons. buttons returned in s0
+				CALL 		Motion_ctrl					; Control the robot automatically according to the sensor readings
+				; store the result in S0 register 
+				CALL		btn2mot						; and calculate new MotCtl - returned in s1
+				OUTPUT	s1,		PA_MOTCTL_IN			; tell Rojobot what to do
+				RETURN																
+
+; sensor readings are stored in the register s1 				
+Motion_ctrl:	TEST 	s1, 18							; check for obstacles by reading the proximity sensor 
+				JUMP 	Z,  black_line_stat				; zero flag will be set when there is no obstacle in front of the sensor
+				; If there is obstacle in front of the sensor then stop the robot 
+				LOAD 	s0, 0							; store 0 - stop motion of the robot 
+				RETURN									; send the data of motion to the robot 
+
+black_line_stat: TEST 	s1, 7							; check if the sensor is over black line or not 
+				JUMP 	Z, move_back					; sensor is not over the black line so move back one step 
+				; sensor is over the black line 
+				FETCH	s4, TURNC						; check if the robot is on black line because it reversed and has to turn 
+				TEST	s4, 1 							; if flag is set 1- start turning the robot else 0- move forward
+				JUMP	C, turn_cont
+				LOAD 	s0, A 							; move forward buttons combination is stored in the motion control  
+				; store the orientation of the robot 
+				; since orientation will only change when the robot is not over the black line
+				; when the black line ends the robot will move backwards one step and start turning right
+				; in this case the original orientation will not be affected and its reverse orientation will be used to 
+				; the robot from going back the direction in which it came
+				LOAD	s2, Botinf
+				AND 	s2, MSKORIENT
+				STORE	s2, ORG_ORNT					; store the current orientation 
+				ADD		s2, ORNT_BASE_TABLE				; point to the location in scratch pad ram to read the reverse orientation 
+				FETCH	s2, (s2)						; read the reverse orientation 
+				STORE	s2, REV_ORNT					; store the value in scratch pad ram to preserve the value
+				RETURN 									; robot was moving forward 
+
+move_back: 		LOAD 	s3, Botinf
+				AND 	s3, MSKORIENT
+				FETCH	s2, ORG_ORNT					; the robot is no longer on the black line 
+				; check if the robot is in turn operation or has to go reverse one distance
+				TEST 	s2, s3							; check if the robot is in the same direction 
+				JUMP 	NZ, turn_cont					; the robot is in middle of turning operation ; jump to turn_continue
+				; robot has to move back 
+				LOAD 	s0, 1							; flag to indicate that the robot will be on black line on next check and has to turn and not 
+														; to move forward 
+				STORE 	s0, TURNC						; set flag 
+				LOAD 	s0, 5 							; set the motion to go reverse
+				RETURN
+				
+turn_cont:		LOAD 	s0, 0							; clear the turn flag 
+				STORE 	s0, TURNC
+				LOAD 	s0, 9							; turn the robot 45 degrees to right fast
+				RETURN
+				; the robot will go forward till its on black line 
+				; when black line is over the robot will move one step back 
+				; again it is on black line but it will turn fast right 45 degrees 
+				; it will now move forward and check for black line
+				; if black line not found goto step 2 
+				
+;*************************
+; Nexys4 I/O Functions
+;*************************
+
+;---------------------
+; DEB_rdbtns() - Reads the debounced pushbuttons
+;
+; Returns the 5 pushbuttons. The buttons are returned as follows
+; (assuming the inputs to the I/O interface matches this order)
+; example:
+;    bit  7    6      5        4        3        2        1         0
+;         r    r   	  r    btn_cntr  btn_left  btn_up  btn_right  btn_down
+;
+; where r = reserved. A value of 1 indicates that the button is pressed.  
+; A 0 indicates that the button is not pressed.
+;
+; Registers used s0
+;---------------------
+DEB_rdbtns:		INPUT		s0,		PA_PBTNS			; read the buttons
+				AND		s0,		MSK_ALLBTNS			; mask out unused bits
+				RETURN								; and return
+				
+				
+;---------------------
+; DEB_rdsw() - Reads the low order debounced switches
+;
+; Returns the  low order switches  [7:0]. The switches are returned as follows
+; example:
+;    bit  7    6    5   4    3    2    1    0
+;        sw7  sw6  sw5 sw4  sw3  sw2  sw1  sw0
+;
+; where r = reserved, sw7 is the leftmost switch and sw0 is the rightmost
+; switch. A value of 1 indicates that the switch is on (up).  A 0 indicates that
+; the switch is off (down).
+;
+; Registers used s0
+;---------------------
+DEB_rdsw:		INPUT		s0,		PA_SLSWTCH			; read the slide switches
+				AND		s0,		MSK_ALLSW_LO	 	; mask out unused bits
+				RETURN								; and return				
+
+				
+;---------------------
+; DEB_rdsw_hi() - Reads the high order debounced switches
+;
+; Returns the  high order switches  [155432:0]. The switches are returned as follows
+; example:
+;    bit   7     6     5    4     3     2     1    0
+;        sw15  sw14  sw13 sw12  sw11  sw10  sw9  sw8
+;
+; where r = reserved, sw15 is the leftmost switch and sw7 is the rightmost
+; switch. A value of 1 indicates that the switch is on (up).  A 0 indicates that
+; the switch is off (down).
+;
+; Registers used s0
+;---------------------
+DEB_rdsw_hi:	INPUT		s0,		PA_SLSWTCH1508		; read the slide switches
+				AND		s0,		MSK_ALLSW_HI	 	; mask out unused bits
+				RETURN								; and return	
+								
+;---------------------
+; LED_wrleds() - Write the low order 8 LEDs
+;
+; Writes the pattern in s1 to the rightmost 8 LEDs on the Nexys4
+;
+; Registers used s0, s1
+;---------------------
+LED_wrleds:		LOAD		s0,		s1					; Copy LEDs to s0 to preserve them
+				AND		s0,		MSK_LEDS_LO			; mask out unused bits
+				OUTPUT	s0,		PA_LEDS				; and write pattern to the LEDs	
+				RETURN								; and return	
+
+;---------------------
+; LED_wrleds_hi() - Write the high order 8 LEDs
+;
+; Writes the pattern in s1 to the lefmost 8 LEDs on the Nexys4
+;
+; Registers used s0, s1
+;---------------------
+LED_wrleds_hi:	LOAD		s0,		s1					; Copy LEDs to s0 to preserve them
+				AND		s0,		MSK_LEDS_HI			; mask out unused bits
+				OUTPUT	s0,		PA_LEDS1508		; and write pattern to the LEDs	
+				RETURN								; and return								
+				
+				
+;---------------------
+; SS_wrdigx() - Write a digit to the righmost 4 display digits
+;
+; Writes the value specified in s1 to the digit number
+; in s2.  The digit number must be 0, 1, 2, or 3
+; All others numbers will be rejected.  
+;
+; Registers used s0, s1, s2, s3
+;---------------------
+SS_wrdigx:		LOAD		s0, 	03					; check to see if the number is <= 3
+				COMPARE	s0,		s2					; 
+				RETURN	C							; C=1 says s2 > 3 - out of range so return
+SS_wrdigx_L1:	LOAD		s0,		PA_DIG0				; set base port address to PA_DIG0
+				SUB		s0,		s2					; next subtract out the digit number.  This will give the port address
+														; for the selected digit.  Cool - it works because the port
+														; addresses for the digits are consecutive starting with digit 3 or 7
+				LOAD		s3,		s1					; Copy the value to s3 so we can leave it unchanged
+				AND		s3,		MSK_CCODE			; mask out unused character code bits		
+				OUTPUT	s3,		(s0)				; abd write the digit to the display at the port pointed to by s0
+				RETURN
+
+;---------------------
+; SS_wrdigx_hi() - Write a digit to the leftmost 4 display digits
+;
+; Writes the value specified in s1 to the digit number
+; in s2.  The digit number must be 4, 5, 6, 7
+; All others numbers will be rejected.  
+;
+; Registers used s0, s1, s2, s3
+;---------------------
+SS_wrdigx_hi:	LOAD		s0,		07					; check if the number is <= 7
+				COMPARE	s0,		s2					; 
+				RETURN	C							; C=10 says s2 <= 07 - out of range so return
+				LOAD		s0,		03					; next check if the number is >= 3
+				COMPARE	s0,		s2					; next check if the number is > 3
+				RETURN	NC							; C=0 says s2 < 4 - out of range so return
+				LOAD		s0,		PA_DIG4				; set base port address to PA_DIG4
+				ADD		s0,		04					; adjust digit number offset (ex: digit 4 should be PA_DIG4+4-4)
+				SUB		s0,		s2					; next subtract out the digit number.  This will give the port address
+														; for the selected digit.  Cool - it works because the port
+														; addresses for the digits are consecutive starting with digit 3 or 7
+				LOAD		s3,		s1					; Copy the value to s3 so we can leave it unchanged
+				AND		s3,		MSK_CCODE			; mask out unused character code bits		
+				OUTPUT	s3,		(s0)				; and write the digit to the display at the port pointed to by s0
+				RETURN				
+				
+;---------------------
+; SS_wrdpts() - Write the decimal points for digit 3 to 0 to the display
+;
+; Writes the decimal points specified in s1 to the display.
+; The decimal point register is formatted as follows:
+;    bit   7  6  5  4   3    2     1     0
+;          r  r  r  r  dp3  dp2   dp1   dp0
+;
+; where r = reserved, dp7 (leftmost), dp3, dp2, dp1 dp0 (rightmost) = 1
+; lights the decimal point. A 0 in the position turns off the decimal point
+;
+; Registers used s0,s1
+;---------------------
+SS_wrdpts:		LOAD		s0,		s1					; Copy the decimal points to s0 to leave s1 unchanged
+				AND		s0,		MSK_DECPTS			; and mask out the unused bits
+				OUTPUT	s0,		PA_DP				; write the decimal points to the display
+				RETURN
+				
+;---------------------
+; SS_wrdpts_hi() - Write the decimal points for digit 7 to 4 to the display
+;
+; Writes the decimal points specified in s1 to the display.
+; The decimal point register is formatted as follows:
+;    bit   7  6  5  4   3    2     1     0
+;          r  r  r  r  dp7  dp6   dp5   dp4
+;
+; where r = reserved, dp7 (leftmost), dp7, dp6, dp5 dp4 (rightmost) = 1
+; lights the decimal point. A 0 in the position turns off the decimal point
+;
+; Registers used s0,s1
+;---------------------
+SS_wrdpts_hi:	LOAD		s0,		s1					; Copy the decimal points to s0 to leave s1 unchanged
+				AND		s0,		MSK_DECPTS_HI		; and mask out the unused bits
+				OUTPUT	s0,		PA_DP0704			; write the decimal points to the display
+				RETURN				
+	
+	
+; =========================
+; === Interrupt Handler ===
+; =========================
+ADDRESS 300
+isr:			STORE		s6,		SP_TEMP1			; 	save s6, s5
+				STORE		s5,		SP_TEMP2			;
+				FETCH		s6,		SP_SEM				; 	fetch the semaphore
+				TEST		s6,		FF					;	if (SP_SEM == 0) {  // update system register values
+				JUMP		NZ,		isr_L0				; -- ZF == 0 says semaphore != 0
+													;		// no - get the data from the rojobot emulator
+				INPUT		LocX,	PA_LOCX				;		get Rojobot X-coordinate 
+				INPUT		LocY,	PA_LOCY				;		get Rojobot Y-coordinate
+				INPUT		Botinf,	PA_BOTINFO			;		get Rojobot Movement and Orientation
+				INPUT		Sensor,	PA_SENSORS			;		get Rojobot Sensors
+				INPUT		s5,		PA_LMDIST			;		get left and right motor distance counters
+				STORE		s5,		SP_LMDIST			;		not displayed in this program but let's stash them
+				INPUT		s5,		PA_RMDIST			;		in case we decide we need them 
+				STORE		s5,		SP_RMDIST			;				  
+				ADD		s6,		01					;		increment semaphore
+				STORE		s6,		SP_SEM				;	}  // update system register values
+isr_L0:			FETCH		s6,		SP_OLDDP			;	toggle  decimal point 0 (rightmost)
+				XOR		s6,		01					;
+				OUTPUT	s6,		PA_DP				;	write directly to decpt port to avoid having to save s1
+				STORE		s6,		SP_OLDDP			;				
+				FETCH		s6,		SP_TEMP1			; 	restore s6, s5
+				FETCH		s5,		SP_TEMP2			;
+				RETURNI			ENABLE				;	and return from interrupt			
+
+; ========================
+; === Interrupt vector ===
+; ========================
+ADDRESS 3FF
+intvect:		JUMP	isr							; jump to interrupt service routine
+				
+					

@@ -1,0 +1,145 @@
+/*
+
+Vivado v2015.4 (64-bit)
+SW Build 1412921 on Wed Nov 18 09:43:45 MST 2015
+Process ID: 5452
+
+Current time: 	12/19/16 12:01:58 AM PST
+Time zone: 	Pacific Standard Time (America/Los_Angeles)
+
+OS: Windows 8
+Version: 6.2
+Architecture: amd64
+Available processors (cores): 4
+
+Screen size: 1280x720
+Screen resolution (DPI): 96
+Available screens: 1
+Default font: family=Tahoma,name=Tahoma,style=plain,size=11
+
+Java version: 	1.8.0_45 64-bit
+Java home: 	C:/Xilinx/Vivado/2015.4/tps/win64/jre
+
+User name: 	Chetan
+User home directory: C:/Users/Chetan
+User working directory: E:/System_on_Chip/Projects/Final-Lode Runner/Project 2/project_1
+User country: 	US
+User language: 	en
+User locale: 	en_US
+
+Vivado preferences path: C:/Users/Chetan/AppData/Roaming/Xilinx/Vivado/2015.4/vivado.ini
+Vivado layouts directory: C:/Users/Chetan/AppData/Roaming/Xilinx/Vivado/2015.4/layouts
+
+GUI allocated memory:	158 MB
+GUI max memory:		3,052 MB
+Engine allocated memory: 369 MB
+
+*/
+
+// TclEventType: START_GUI
+// Tcl Message: start_gui 
+// TclEventType: PROJECT_OPEN_DIALOG
+// [GUI Memory]: 36 MB (+35349kb) [00:00:21]
+// [Engine Memory]: 340 MB (+205240kb) [00:00:21]
+// TclEventType: PROJECT_OPEN_DIALOG
+// bF:g (cq:JFrame):  Open Project : addNotify
+// Opening Vivado Project: E:\System_on_Chip\Projects\Final-Lode Runner\Project 2\project_1\project_1.xpr. Version: Vivado v2015.4 
+// TclEventType: DEBUG_PROBE_SET_CHANGE
+// Tcl Message: open_project {E:/System_on_Chip/Projects/Final-Lode Runner/Project 2/project_1/project_1.xpr} 
+// TclEventType: MSGMGR_MOVEMSG
+// TclEventType: FILE_SET_NEW
+// TclEventType: RUN_COMPLETED
+// TclEventType: RUN_CURRENT
+// HMemoryUtils.trashcanNow. Engine heap size: 379 MB. GUI used memory: 24 MB. Current time: 12/19/16 12:02:00 AM PST
+// [Engine Memory]: 379 MB (+22999kb) [00:00:25]
+// TclEventType: FILE_SET_CHANGE
+// [Engine Memory]: 420 MB (+23233kb) [00:00:35]
+// TclEventType: FILE_SET_CHANGE
+// HMemoryUtils.trashcanNow. Engine heap size: 421 MB. GUI used memory: 24 MB. Current time: 12/19/16 12:02:15 AM PST
+// TclEventType: FILE_SET_CHANGE
+// TclEventType: PROJECT_NEW
+// [GUI Memory]: 43 MB (+5282kb) [00:00:44]
+// [GUI Memory]: 84 MB (+40365kb) [00:00:48]
+// [GUI Memory]: 92 MB (+4352kb) [00:00:49]
+// [GUI Memory]: 101 MB (+4548kb) [00:00:52]
+// [Engine Memory]: 444 MB (+3206kb) [00:00:57]
+// TclEventType: FILE_SET_OPTIONS_CHANGE
+// Tcl Message: open_project {E:/System_on_Chip/Projects/Final-Lode Runner/Project 2/project_1/project_1.xpr} 
+// Tcl Message: Scanning sources... Finished scanning sources 
+// Tcl Message: INFO: [IP_Flow 19-234] Refreshing IP repositories INFO: [IP_Flow 19-1704] No user IP repositories specified INFO: [IP_Flow 19-2313] Loaded Vivado IP repository 'C:/Xilinx/Vivado/2015.4/data/ip'. 
+// HMemoryUtils.trashcanNow. Engine heap size: 444 MB. GUI used memory: 74 MB. Current time: 12/19/16 12:02:33 AM PST
+// TclEventType: FILE_SET_OPTIONS_CHANGE
+// Project name: project_1; location: E:/System_on_Chip/Projects/Final-Lode Runner/Project 2/project_1; part: xc7a100tcsg324-1
+// Tcl Message: open_project: Time (s): cpu = 00:00:34 ; elapsed = 00:00:41 . Memory (MB): peak = 867.348 ; gain = 287.273 
+dismissDialog("Open Project"); // bF:g (cq:JFrame)
+// TclEventType: DG_GRAPH_STALE
+// TclEventType: DG_UPDATE_GRAPH
+// TclEventType: DG_ANALYSIS_MSG_RESET
+// TclEventType: DG_UPDATE_GRAPH
+// TclEventType: FILE_SET_CHANGE
+// [GUI Memory]: 107 MB (+1237kb) [00:01:05]
+// TclEventType: FILE_SET_CHANGE
+// TclEventType: DG_UPDATE_GRAPH
+// TclEventType: DG_ANALYSIS_MSG_RESET
+// TclEventType: DG_UPDATE_GRAPH
+// Elapsed time: 80 seconds
+minimizeFrame(RDIResource.RDIViews_PROPERTIES, "Properties"); // at:DockableFrame (FrameContainer:JideTabbedPane, cq:JFrame)
+minimizeFrame(PAResourceOtoP.PAViews_DESIGN_RUNS, "Design Runs"); // at:DockableFrame (FrameContainer:JideTabbedPane, cq:JFrame)
+expandTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Design Sources, ICON0 (ICON0.xci)]", 3); // y:k (I:JPanel, cq:JFrame)
+// G:aY (cq:JFrame): Show IP Hierarchy: addNotify
+selectButton(RDIResource.BaseDialog_OK, "OK"); // a:JButton (JPanel:JComponent, G:aY)
+// TclEventType: DG_GRAPH_STALE
+dismissDialog("Show IP Hierarchy"); // G:aY (cq:JFrame)
+// TclEventType: DG_UPDATE_GRAPH
+// TclEventType: DG_ANALYSIS_MSG_RESET
+// [GUI Memory]: 114 MB (+1794kb) [00:02:34]
+// [Engine Memory]: 481 MB (+15443kb) [00:02:35]
+// HMemoryUtils.trashcanNow. Engine heap size: 481 MB. GUI used memory: 74 MB. Current time: 12/19/16 12:04:10 AM PST
+// TclEventType: DG_UPDATE_GRAPH
+// Elapsed time: 14 seconds
+expandTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Design Sources, Opnt2_Icon (Opnt2_Icon.xci)]", 6); // y:k (I:JPanel, cq:JFrame)
+// G:aY (cq:JFrame): Show IP Hierarchy: addNotify
+selectButton(RDIResource.BaseDialog_OK, "OK"); // a:JButton (JPanel:JComponent, G:aY)
+// TclEventType: DG_GRAPH_STALE
+dismissDialog("Show IP Hierarchy"); // G:aY (cq:JFrame)
+// TclEventType: DG_UPDATE_GRAPH
+// TclEventType: DG_ANALYSIS_MSG_RESET
+// [Engine Memory]: 513 MB (+7807kb) [00:02:52]
+// TclEventType: DG_UPDATE_GRAPH
+// HMemoryUtils.trashcanNow. Engine heap size: 513 MB. GUI used memory: 75 MB. Current time: 12/19/16 12:04:30 AM PST
+// Elapsed time: 12 seconds
+selectTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Design Sources, Opnt2_Icon (Opnt2_Icon.xci)]", 4, true); // y:k (I:JPanel, cq:JFrame) - Node
+selectTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Design Sources, Opnt2_Icon (Opnt2_Icon.xci)]", 4, true, false, false, false, false, true); // y:k (I:JPanel, cq:JFrame) - Double Click - Node
+// Run Command: PAResourceCommand.PACommandNames_RECUSTOMIZE_CORE
+// T:bF (cq:JFrame):  Re-customize IP : addNotify
+// TclEventType: LOAD_FEATURE
+// [Engine Memory]: 544 MB (+5272kb) [00:03:07]
+// t:g (cq:JFrame): Re-customize IP: addNotify
+dismissDialog("Re-customize IP"); // T:bF (cq:JFrame)
+selectTab(PAResourceEtoH.HACGCTabbedPane_TABBED_PANE, (HResource) null, "Port A Options", 1); // aN:g (H:JPanel, t:g)
+selectTab(PAResourceEtoH.HACGCTabbedPane_TABBED_PANE, (HResource) null, "Other Options", 2); // aN:g (H:JPanel, t:g)
+// [GUI Memory]: 121 MB (+713kb) [00:05:24]
+// Elapsed time: 642 seconds
+selectButton(PAResourceEtoH.HACGCCoeFileWidget_BROWSE, "Browse"); // a:JButton (JPanel:JComponent, t:g)
+// Elapsed time: 18 seconds
+dismissFileChooser();
+// Elapsed time: 253 seconds
+selectButton(RDIResource.BaseDialog_CANCEL, "Cancel"); // a:JButton (JPanel:JComponent, t:g)
+dismissDialog("Re-customize IP"); // t:g (cq:JFrame)
+// Elapsed time: 16 seconds
+expandTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Design Sources, Coefficient Files]", 13); // y:k (I:JPanel, cq:JFrame)
+collapseTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Design Sources, Coefficient Files]", 13); // y:k (I:JPanel, cq:JFrame)
+expandTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Design Sources, Coefficient Files]", 13); // y:k (I:JPanel, cq:JFrame)
+collapseTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Design Sources, Coefficient Files]", 13); // y:k (I:JPanel, cq:JFrame)
+// Elapsed time: 24 seconds
+selectTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Design Sources, ICON0 (ICON0.xci), ICON0 - ICON0_arch (ICON0.vhd)]", 3, true); // y:k (I:JPanel, cq:JFrame) - Node
+expandTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Design Sources, n4fpga (n4fpga.v)]", 1); // y:k (I:JPanel, cq:JFrame)
+selectTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Design Sources, n4fpga (n4fpga.v), kbrd - kybrd_if (kybrd_if.v)]", 2, true); // y:k (I:JPanel, cq:JFrame) - Node
+selectTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Design Sources, n4fpga (n4fpga.v), kbrd - kybrd_if (kybrd_if.v)]", 2, true, false, false, false, true, false); // y:k (I:JPanel, cq:JFrame) - Popup Trigger - Node
+selectMenu(PAResourceQtoS.SrcMenu_IP_HIERARCHY, "IP Hierarchy"); // aa:JMenu (al:JPopupMenu, Popup:JWindow)
+selectMenuItem(PAResourceCommand.PACommandNames_GOTO_INSTANTIATION, "Go To Source"); // ae:JMenuItem (al:JPopupMenu, Popup:JWindow)
+// Run Command: PAResourceCommand.PACommandNames_GOTO_INSTANTIATION
+// Elapsed time: 26 seconds
+expandTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Design Sources, n4fpga (n4fpga.v), kbrd - kybrd_if (kybrd_if.v)]", 2); // y:k (I:JPanel, cq:JFrame)
+selectTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Design Sources, n4fpga (n4fpga.v), kbrd - kybrd_if (kybrd_if.v), ps2 - PS2Receiver (kbrd.v)]", 3, true); // y:k (I:JPanel, cq:JFrame) - Node
+selectTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Design Sources, n4fpga (n4fpga.v), kbrd - kybrd_if (kybrd_if.v), ps2 - PS2Receiver (kbrd.v)]", 3, true, false, false, false, false, true); // y:k (I:JPanel, cq:JFrame) - Double Click - Node

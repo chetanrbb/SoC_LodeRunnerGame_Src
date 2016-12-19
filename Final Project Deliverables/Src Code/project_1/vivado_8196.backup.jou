@@ -1,0 +1,189 @@
+#-----------------------------------------------------------
+# Vivado v2015.4 (64-bit)
+# SW Build 1412921 on Wed Nov 18 09:43:45 MST 2015
+# IP Build 1412160 on Tue Nov 17 13:47:24 MST 2015
+# Start of session at: Sat May 21 20:00:42 2016
+# Process ID: 8196
+# Current directory: E:/System_on_Chip/Projects/Final/Project 2/project_1
+# Command line: vivado.exe -gui_launcher_event rodinguilauncherevent4224 E:\System_on_Chip\Projects\Final\Project 2\project_1\project_1.xpr
+# Log file: E:/System_on_Chip/Projects/Final/Project 2/project_1/vivado.log
+# Journal file: E:/System_on_Chip/Projects/Final/Project 2/project_1\vivado.jou
+#-----------------------------------------------------------
+start_gui
+open_project {E:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.xpr}
+update_compile_order -fileset sources_1
+update_compile_order -fileset sources_1
+create_ip -name blk_mem_gen -vendor xilinx.com -library ip -version 8.3 -module_name World_map
+set_property -dict [list CONFIG.Memory_Type {Dual_Port_ROM} CONFIG.Assume_Synchronous_Clk {true} CONFIG.Write_Width_A {2} CONFIG.Write_Depth_A {262144} CONFIG.Enable_A {Always_Enabled} CONFIG.Load_Init_File {true} CONFIG.Coe_File {E:/System_on_Chip/Projects/Final/map.coe} CONFIG.Fill_Remaining_Memory_Locations {false} CONFIG.Disable_Out_of_Range_Warnings {false} CONFIG.Read_Width_A {2} CONFIG.Write_Width_B {2} CONFIG.Read_Width_B {2} CONFIG.Enable_B {Use_ENB_Pin} CONFIG.Register_PortB_Output_of_Memory_Primitives {true} CONFIG.Port_A_Write_Rate {0} CONFIG.Port_B_Clock {100} CONFIG.Port_B_Write_Rate {0} CONFIG.Port_B_Enable_Rate {100}] [get_ips World_map]
+generate_target {instantiation_template} [get_files {{e:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.srcs/sources_1/ip/World_map/World_map.xci}}]
+update_compile_order -fileset sources_1
+generate_target all [get_files  {{e:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.srcs/sources_1/ip/World_map/World_map.xci}}]
+export_ip_user_files -of_objects [get_files {{e:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.srcs/sources_1/ip/World_map/World_map.xci}}] -no_script -force -quiet
+create_ip_run [get_files -of_objects [get_fileset sources_1] {{e:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.srcs/sources_1/ip/World_map/World_map.xci}}]
+launch_run -jobs 2 World_map_synth_1
+wait_on_run World_map_synth_1
+export_simulation -of_objects [get_files {{e:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.srcs/sources_1/ip/World_map/World_map.xci}}] -directory {E:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.ip_user_files/sim_scripts} -force -quiet
+update_compile_order -fileset sources_1
+reset_run synth_1
+launch_runs synth_1 -jobs 2
+wait_on_run synth_1
+reset_run synth_1
+launch_runs synth_1 -jobs 2
+wait_on_run synth_1
+set_property -dict [list CONFIG.Enable_B {Always_Enabled}] [get_ips World_map]
+generate_target all [get_files  {{e:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.srcs/sources_1/ip/World_map/World_map.xci}}]
+export_ip_user_files -of_objects [get_files {{e:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.srcs/sources_1/ip/World_map/World_map.xci}}] -no_script -force -quiet
+reset_run World_map_synth_1
+launch_run -jobs 2 World_map_synth_1
+wait_on_run World_map_synth_1
+export_simulation -of_objects [get_files {{e:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.srcs/sources_1/ip/World_map/World_map.xci}}] -directory {E:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.ip_user_files/sim_scripts} -force -quiet
+reset_run synth_1
+launch_runs synth_1 -jobs 2
+wait_on_run synth_1
+remove_files {{E:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.srcs/sources_1/imports/world_map_lr/world_map.ngc}}
+remove_files {{E:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.srcs/sources_1/imports/hdl_part1/world_map.v}}
+reset_run synth_1
+launch_runs synth_1 -jobs 2
+wait_on_run synth_1
+launch_runs impl_1 -to_step write_bitstream -jobs 2
+wait_on_run impl_1
+open_hw
+connect_hw_server -url localhost:3121
+current_hw_target [get_hw_targets */xilinx_tcf/Digilent/210274532920A]
+set_property PARAM.FREQUENCY 15000000 [get_hw_targets */xilinx_tcf/Digilent/210274532920A]
+open_hw_target
+set_property PROGRAM.FILE {E:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.runs/impl_1/n4fpga.bit} [lindex [get_hw_devices] 0]
+current_hw_device [lindex [get_hw_devices] 0]
+refresh_hw_device -update_hw_probes false [lindex [get_hw_devices] 0]
+set_property PROBES.FILE {} [lindex [get_hw_devices] 0]
+set_property PROGRAM.FILE {E:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.runs/impl_1/n4fpga.bit} [lindex [get_hw_devices] 0]
+program_hw_devices [lindex [get_hw_devices] 0]
+refresh_hw_device [lindex [get_hw_devices] 0]
+reset_run synth_1
+launch_runs impl_1 -to_step write_bitstream -jobs 2
+wait_on_run impl_1
+open_run impl_1
+reset_run impl_1 -prev_step 
+launch_runs impl_1 -to_step write_bitstream -jobs 2
+wait_on_run impl_1
+set_property PROBES.FILE {} [lindex [get_hw_devices] 0]
+set_property PROGRAM.FILE {E:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.runs/impl_1/n4fpga.bit} [lindex [get_hw_devices] 0]
+program_hw_devices [lindex [get_hw_devices] 0]
+refresh_hw_device [lindex [get_hw_devices] 0]
+reset_run synth_1
+launch_runs impl_1 -to_step write_bitstream -jobs 2
+wait_on_run impl_1
+reset_run synth_1
+launch_runs impl_1 -to_step write_bitstream -jobs 2
+wait_on_run impl_1
+reset_run synth_1
+launch_runs impl_1 -to_step write_bitstream -jobs 2
+wait_on_run impl_1
+set_property PROBES.FILE {} [lindex [get_hw_devices] 0]
+set_property PROGRAM.FILE {E:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.runs/impl_1/n4fpga.bit} [lindex [get_hw_devices] 0]
+program_hw_devices [lindex [get_hw_devices] 0]
+refresh_hw_device [lindex [get_hw_devices] 0]
+reset_run synth_1
+launch_runs impl_1 -to_step write_bitstream -jobs 2
+wait_on_run impl_1
+set_property PROBES.FILE {} [lindex [get_hw_devices] 0]
+set_property PROGRAM.FILE {E:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.runs/impl_1/n4fpga.bit} [lindex [get_hw_devices] 0]
+program_hw_devices [lindex [get_hw_devices] 0]
+refresh_hw_device [lindex [get_hw_devices] 0]
+reset_run synth_1
+launch_runs impl_1 -to_step write_bitstream -jobs 2
+wait_on_run impl_1
+reset_run impl_1 -noclean_dir 
+reset_run synth_1
+launch_runs impl_1 -to_step write_bitstream -jobs 2
+wait_on_run impl_1
+set_property PROBES.FILE {} [lindex [get_hw_devices] 0]
+set_property PROGRAM.FILE {E:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.runs/impl_1/n4fpga.bit} [lindex [get_hw_devices] 0]
+program_hw_devices [lindex [get_hw_devices] 0]
+refresh_hw_device [lindex [get_hw_devices] 0]
+reset_run impl_1 -prev_step 
+launch_runs impl_1 -to_step write_bitstream -jobs 2
+wait_on_run impl_1
+set_property PROBES.FILE {} [lindex [get_hw_devices] 0]
+set_property PROGRAM.FILE {E:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.runs/impl_1/n4fpga.bit} [lindex [get_hw_devices] 0]
+program_hw_devices [lindex [get_hw_devices] 0]
+refresh_hw_device [lindex [get_hw_devices] 0]
+reset_run synth_1
+launch_runs impl_1 -to_step write_bitstream -jobs 2
+wait_on_run impl_1
+set_property PROBES.FILE {} [lindex [get_hw_devices] 0]
+set_property PROGRAM.FILE {E:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.runs/impl_1/n4fpga.bit} [lindex [get_hw_devices] 0]
+program_hw_devices [lindex [get_hw_devices] 0]
+refresh_hw_device [lindex [get_hw_devices] 0]
+reset_run synth_1
+launch_runs synth_1 -jobs 2
+wait_on_run synth_1
+launch_runs impl_1 -jobs 2
+wait_on_run impl_1
+launch_runs impl_1 -to_step write_bitstream -jobs 2
+wait_on_run impl_1
+set_property PROBES.FILE {} [lindex [get_hw_devices] 0]
+set_property PROGRAM.FILE {E:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.runs/impl_1/n4fpga.bit} [lindex [get_hw_devices] 0]
+program_hw_devices [lindex [get_hw_devices] 0]
+refresh_hw_device [lindex [get_hw_devices] 0]
+reset_run synth_1
+launch_runs impl_1 -to_step write_bitstream -jobs 2
+wait_on_run impl_1
+set_property PROBES.FILE {} [lindex [get_hw_devices] 0]
+set_property PROGRAM.FILE {E:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.runs/impl_1/n4fpga.bit} [lindex [get_hw_devices] 0]
+program_hw_devices [lindex [get_hw_devices] 0]
+refresh_hw_device [lindex [get_hw_devices] 0]
+create_ip -name blk_mem_gen -vendor xilinx.com -library ip -version 8.3 -module_name world_map_ram
+set_property -dict [list CONFIG.Memory_Type {True_Dual_Port_RAM} CONFIG.Assume_Synchronous_Clk {true} CONFIG.Write_Width_A {2} CONFIG.Write_Depth_A {262144} CONFIG.Enable_A {Always_Enabled} CONFIG.Enable_B {Always_Enabled} CONFIG.Load_Init_File {true} CONFIG.Coe_File {E:/System_on_Chip/Projects/Final/map.coe} CONFIG.Read_Width_A {2} CONFIG.Operating_Mode_A {NO_CHANGE} CONFIG.Write_Width_B {2} CONFIG.Read_Width_B {2} CONFIG.Operating_Mode_B {READ_FIRST} CONFIG.Register_PortA_Output_of_Memory_Primitives {true} CONFIG.Register_PortB_Output_of_Memory_Primitives {true} CONFIG.Port_B_Clock {100} CONFIG.Port_B_Write_Rate {50} CONFIG.Port_B_Enable_Rate {100}] [get_ips world_map_ram]
+generate_target {instantiation_template} [get_files {{e:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.srcs/sources_1/ip/world_map_ram/world_map_ram.xci}}]
+update_compile_order -fileset sources_1
+generate_target all [get_files  {{e:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.srcs/sources_1/ip/world_map_ram/world_map_ram.xci}}]
+export_ip_user_files -of_objects [get_files {{e:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.srcs/sources_1/ip/world_map_ram/world_map_ram.xci}}] -no_script -force -quiet
+create_ip_run [get_files -of_objects [get_fileset sources_1] {{e:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.srcs/sources_1/ip/world_map_ram/world_map_ram.xci}}]
+launch_run -jobs 2 world_map_ram_synth_1
+wait_on_run world_map_ram_synth_1
+export_simulation -of_objects [get_files {{e:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.srcs/sources_1/ip/world_map_ram/world_map_ram.xci}}] -directory {E:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.ip_user_files/sim_scripts} -force -quiet
+reset_run synth_1
+launch_runs synth_1 -jobs 2
+wait_on_run synth_1
+reset_run synth_1
+launch_runs impl_1 -to_step write_bitstream -jobs 2
+wait_on_run impl_1
+disconnect_hw_server localhost:3121
+connect_hw_server -url localhost:3121
+current_hw_target [get_hw_targets */xilinx_tcf/Digilent/210274532920A]
+set_property PARAM.FREQUENCY 15000000 [get_hw_targets */xilinx_tcf/Digilent/210274532920A]
+open_hw_target
+set_property PROGRAM.FILE {E:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.runs/impl_1/n4fpga.bit} [lindex [get_hw_devices] 0]
+current_hw_device [lindex [get_hw_devices] 0]
+refresh_hw_device -update_hw_probes false [lindex [get_hw_devices] 0]
+set_property PROBES.FILE {} [lindex [get_hw_devices] 0]
+set_property PROGRAM.FILE {E:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.runs/impl_1/n4fpga.bit} [lindex [get_hw_devices] 0]
+program_hw_devices [lindex [get_hw_devices] 0]
+refresh_hw_device [lindex [get_hw_devices] 0]
+close_project
+open_project {E:/System_on_Chip/Projects/Project 3/project_2/project_2.xpr}
+open_run impl_1
+remove_files -fileset constrs_1 {{E:/System_on_Chip/Projects/Project 3/project_2/project_2.srcs/constrs_1/new/constr.xdc}}
+reset_run synth_1
+launch_runs impl_1 -jobs 2
+wait_on_run impl_1
+close [ open {E:/System_on_Chip/Projects/Project 3/project_2/project_2.srcs/constrs_1/new/c.xdc} w ]
+add_files -fileset constrs_1 {{E:/System_on_Chip/Projects/Project 3/project_2/project_2.srcs/constrs_1/new/c.xdc}}
+reset_run synth_1
+launch_runs synth_1 -jobs 2
+wait_on_run synth_1
+close_design
+open_run synth_1 -name synth_1
+set_property target_constrs_file {E:/System_on_Chip/Projects/Project 3/project_2/project_2.srcs/constrs_1/new/c.xdc} [current_fileset -constrset]
+reset_run synth_1
+launch_runs synth_1 -jobs 2
+wait_on_run synth_1
+report_timing_summary -delay_type min_max -report_unconstrained -check_timing_verbose -max_paths 10 -input_pins -name timing_1
+launch_runs impl_1 -jobs 2
+wait_on_run impl_1
+close_project
+open_project {E:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.xpr}
+close [ open {E:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.srcs/sources_1/new/maze_map_if.v} w ]
+add_files {{E:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.srcs/sources_1/new/maze_map_if.v}}
+update_compile_order -fileset sources_1

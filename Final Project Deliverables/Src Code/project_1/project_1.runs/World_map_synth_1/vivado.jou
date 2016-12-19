@@ -1,0 +1,12 @@
+#-----------------------------------------------------------
+# Vivado v2015.4 (64-bit)
+# SW Build 1412921 on Wed Nov 18 09:43:45 MST 2015
+# IP Build 1412160 on Tue Nov 17 13:47:24 MST 2015
+# Start of session at: Fri Jun 03 22:06:08 2016
+# Process ID: 8612
+# Current directory: E:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.runs/World_map_synth_1
+# Command line: vivado.exe -log World_map.vds -mode batch -messageDb vivado.pb -notrace -source World_map.tcl
+# Log file: E:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.runs/World_map_synth_1/World_map.vds
+# Journal file: E:/System_on_Chip/Projects/Final/Project 2/project_1/project_1.runs/World_map_synth_1\vivado.jou
+#-----------------------------------------------------------
+source World_map.tcl -notrace

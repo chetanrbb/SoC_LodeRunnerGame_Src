@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenRun Id="plyr_run_e_synth_1" LaunchPart="xc7a100tcsg324-1" LaunchTime="1465353003">
+  <File Type="RDS-DCP" Name="plyr_run_e.dcp"/>
+  <File Type="RUN-CONSTRS" Name="$PDATADIR/runs/plyr_run_e_synth_1/constrs_in.xml"/>
+  <File Type="RDS-UTIL-PB" Name="plyr_run_e_utilization_synth.pb"/>
+  <File Type="RUN-SRCS" Name="$PDATADIR/runs/plyr_run_e_synth_1/sources.xml"/>
+  <File Type="RDS-PROPCONSTRS" Name="plyr_run_e_drc_synth.rpt"/>
+  <File Type="PA-TCL" Name="plyr_run_e.tcl"/>
+  <File Type="RUN-STRAT" Name="$PDATADIR/runs/plyr_run_e_synth_1/plyr_run_e_synth_1.psg"/>
+  <File Type="RDS-RDS" Name="plyr_run_e.vds"/>
+  <File Type="RDS-UTIL" Name="plyr_run_e_utilization_synth.rpt"/>
+  <File Type="VDS-TIMINGSUMMARY" Name="plyr_run_e_timing_summary_synth.rpt"/>
+  <File Type="VDS-TIMING-PB" Name="plyr_run_e_timing_summary_synth.pb"/>
+  <FileSet Name="sources" Type="BlockSrcs" RelSrcDir="$PSRCDIR/plyr_run_e">
+    <File Path="$PSRCDIR/sources_1/ip/plyr_run_e/plyr_run_e.xci">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <Config>
+      <Option Name="TopModule" Val="plyr_run_e"/>
+      <Option Name="UseBlackboxStub" Val="1"/>
+    </Config>
+  </FileSet>
+  <FileSet Name="constrs_in" Type="BlockSrcs" RelSrcDir="$PSRCDIR/plyr_run_e">
+    <File Path="$PSRCDIR/sources_1/ip/plyr_run_e/plyr_run_e.xci">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <Config>
+      <Option Name="TopModule" Val="plyr_run_e"/>
+      <Option Name="UseBlackboxStub" Val="1"/>
+    </Config>
+  </FileSet>
+  <Strategy Version="1" Minor="2">
+    <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2015"/>
+    <Step Id="synth_design"/>
+  </Strategy>
+</GenRun>
